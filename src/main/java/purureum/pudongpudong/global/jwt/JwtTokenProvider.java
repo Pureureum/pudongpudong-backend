@@ -43,16 +43,14 @@ public class JwtTokenProvider {
      * Access Token을 생성합니다.
      *
      * @param memberId 사용자 고유 ID
-     * @param email    사용자 이메일
      * @return 생성된 Access Token
      */
-    public String createAccessToken(Long memberId, String email) {
+    public String createAccessToken(Long memberId) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + accessTokenExpirationMillis);
 
         return Jwts.builder()
                 .setSubject(String.valueOf(memberId)) // 토큰의 주체 (여기서는 memberId)
-                .claim("email", email) // 클레임 추가 (이메일)
                 .claim("type", "access") // 토큰 타입
                 .setIssuedAt(now) // 발행 시간
                 .setExpiration(validity) // 만료 시간
@@ -64,16 +62,14 @@ public class JwtTokenProvider {
      * Refresh Token을 생성합니다.
      *
      * @param memberId 사용자 고유 ID
-     * @param email    사용자 이메일
      * @return 생성된 Refresh Token
      */
-    public String createRefreshToken(Long memberId, String email) {
+    public String createRefreshToken(Long memberId) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + refreshTokenExpirationMillis);
 
         return Jwts.builder()
                 .setSubject(String.valueOf(memberId))
-                .claim("email", email)
                 .claim("type", "refresh") // 토큰 타입
                 .setIssuedAt(now)
                 .setExpiration(validity)

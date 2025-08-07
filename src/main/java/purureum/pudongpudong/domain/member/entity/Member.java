@@ -3,7 +3,7 @@ package purureum.pudongpudong.domain.member.entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.*; // JPA 관련 어노테이션 임포트
+import jakarta.persistence.*;
 import purureum.pudongpudong.domain.member.enums.Role;
 
 /**
@@ -11,13 +11,13 @@ import purureum.pudongpudong.domain.member.enums.Role;
  * 데이터베이스의 'member' 테이블과 매핑됩니다.
  */
 @Getter
-@NoArgsConstructor // 기본 생성자 자동 생성 (JPA 엔티티에 필수)
-@Entity // JPA 엔티티임을 선언
-@Table(name = "member") // 매핑될 테이블 이름 지정
+@NoArgsConstructor
+@Entity
+@Table(name = "member")
 public class Member {
 
     @Id // 기본 키(Primary Key) 지정
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 자동 증분 전략 (MySQL의 AUTO_INCREMENT와 유사)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 사용자 고유 ID (우리 애플리케이션 내부 ID)
 
     @Column(nullable = false) // NULL을 허용하지 않음
@@ -25,9 +25,6 @@ public class Member {
 
     @Column(nullable = false)
     private String providerId; // OAuth2 제공자에서 발급한 사용자 고유 ID (예: 카카오 ID)
-
-    @Column(nullable = false, unique = true) // NULL을 허용하지 않고, 유니크 제약 조건 추가
-    private String email; // 사용자 이메일
 
     @Column(nullable = false)
     private String nickname; // 사용자 닉네임
@@ -40,10 +37,9 @@ public class Member {
     private Role role; // 사용자 역할 (USER, ADMIN 등)
 
     @Builder // 빌더 패턴을 사용하여 객체 생성 가능
-    public Member(String provider, String providerId, String email, String nickname, String profileImageUrl, Role role) {
+    public Member(String provider, String providerId, String nickname, String profileImageUrl, Role role) {
         this.provider = provider;
         this.providerId = providerId;
-        this.email = email;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
         this.role = role;

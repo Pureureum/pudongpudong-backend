@@ -28,8 +28,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider; // JWT 토큰 생성 및 관리를 위한 서비스
 
     // TODO: 프론트엔드 리다이렉트 URL 설정 (application.yml 등에서 관리하는 것이 좋습니다)
-    // 현재는 예시 URL을 사용합니다.
-    private final String FRONTEND_REDIRECT_URL = "http://localhost:3000/oauth2/redirect";
+    // 현재는 Swagger UI로 리다이렉트하여 테스트하기 쉽게 설정
+    private final String FRONTEND_REDIRECT_URL = "http://localhost:8080/swagger-ui/index.html";
 
     /**
      * OAuth2 로그인 성공 시 처리 로직.
@@ -43,29 +43,56 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
-        log.info("OAuth2 로그인 성공! Authentication: {}", authentication.getName());
+        try {
+            log.info("=== OAuth2 로그인 성공 핸들러 시작 ===");
+            log.info("OAuth2 로그인 성공! Authentication: {}", authentication.getName());
+            log.info("Authentication Principal: {}", authentication.getPrincipal());
+            log.info("Authentication Principal Type: {}", authentication.getPrincipal().getClass().getName());
+            log.info("Authentication Authorities: {}", authentication.getAuthorities());
 
-        // CustomOAuth2User 객체 가져오기
-        CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+            // CustomOAuth2User 객체 가져오기
+            if (!(authentication.getPrincipal() instanceof CustomOAuth2User)) {
+                log.error("Authentication Principal이 CustomOAuth2User가 아닙니다: {}", authentication.getPrincipal().getClass());
+                throw new RuntimeException("잘못된 사용자 정보입니다.");
+            }
 
-        // JWT 토큰 생성 (우리 애플리케이션의 사용자 ID를 사용하여 토큰 생성)
-        // TODO: roles 정보도 토큰에 포함시키는 로직 추가 고려
-        String accessToken = jwtTokenProvider.createAccessToken(oAuth2User.getMemberId(), oAuth2User.getEmail());
-        String refreshToken = jwtTokenProvider.createRefreshToken(oAuth2User.getMemberId(), oAuth2User.getEmail());
+            CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+            log.info("CustomOAuth2User 정보 - memberId: {}, nickname: {}, profileImageUrl: {}", 
+                    oAuth2User.getMemberId(), oAuth2User.getNickname(), oAuth2User.getProfileImageUrl());
 
-        log.info("Generated Access Token: {}", accessToken);
-        log.info("Generated Refresh Token: {}", refreshToken);
+            // JWT 토큰 생성 (우리 애플리케이션의 사용자 ID를 사용하여 토큰 생성)
+            log.info("JWT 토큰 생성 시작 - memberId: {}", oAuth2User.getMemberId());
+            String accessToken = jwtTokenProvider.createAccessToken(oAuth2User.getMemberId());
+            String refreshToken = jwtTokenProvider.createRefreshToken(oAuth2User.getMemberId());
 
-        // TODO: Refresh Token을 DB에 저장하거나 Redis에 저장하는 로직 추가 (보안 강화)
+            log.info("Generated Access Token: {}", accessToken);
+            log.info("Generated Refresh Token: {}", refreshToken);
 
-        // 프론트엔드 URL로 리다이렉트 (JWT 토큰을 쿼리 파라미터로 전달)
-        // 실제 운영 환경에서는 토큰을 HTTP Only 쿠키나 다른 보안적인 방법으로 전달하는 것을 고려해야 합니다.
-        String redirectUrl = UriComponentsBuilder.fromUriString(FRONTEND_REDIRECT_URL)
-                .queryParam("accessToken", URLEncoder.encode(accessToken, StandardCharsets.UTF_8))
-                .queryParam("refreshToken", URLEncoder.encode(refreshToken, StandardCharsets.UTF_8))
-                .build().toUriString();
+            // TODO: Refresh Token을 DB에 저장하거나 Redis에 저장하는 로직 추가 (보안 강화)
 
-        log.info("Redirecting to: {}", redirectUrl);
-        response.sendRedirect(redirectUrl);
+            // 간단한 테스트를 위해 JSON 응답으로 변경
+            response.setContentType("application/json;charset=UTF-8");
+            String jsonResponse = String.format(
+                "{\"success\":true,\"accessToken\":\"%s\",\"refreshToken\":\"%s\",\"message\":\"로그인 성공\"}",
+                accessToken, refreshToken
+            );
+            
+            log.info("JSON 응답 전송: {}", jsonResponse);
+            response.getWriter().write(jsonResponse);
+            log.info("=== OAuth2 로그인 성공 핸들러 완료 ===");
+            
+        } catch (Exception e) {
+            log.error("=== OAuth2 로그인 성공 핸들러에서 오류 발생 ===");
+            log.error("OAuth2 로그인 성공 핸들러에서 오류 발생", e);
+            
+            // 오류 응답도 JSON으로 전송
+            response.setContentType("application/json;charset=UTF-8");
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            String errorResponse = String.format(
+                "{\"success\":false,\"error\":\"%s\",\"message\":\"로그인 처리 중 오류 발생\"}",
+                e.getMessage()
+            );
+            response.getWriter().write(errorResponse);
+        }
     }
 }

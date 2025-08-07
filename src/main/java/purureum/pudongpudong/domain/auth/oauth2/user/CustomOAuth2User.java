@@ -19,7 +19,6 @@ public class CustomOAuth2User implements OAuth2User {
 
     // 우리 애플리케이션의 Member 엔티티와 매핑되는 정보
     private final Long memberId;
-    private final String email;
     private final String nickname;
     private final String profileImageUrl;
 
@@ -30,7 +29,6 @@ public class CustomOAuth2User implements OAuth2User {
      * @param attributes       OAuth2 공급자로부터 받은 원본 사용자 정보
      * @param nameAttributeKey 사용자 이름(고유 식별자)을 나타내는 속성 키 (예: "id" for Kakao)
      * @param memberId         우리 애플리케이션의 사용자 고유 ID
-     * @param email            사용자 이메일
      * @param nickname         사용자 닉네임
      * @param profileImageUrl  사용자 프로필 이미지 URL
      */
@@ -38,14 +36,12 @@ public class CustomOAuth2User implements OAuth2User {
                             Map<String, Object> attributes,
                             String nameAttributeKey,
                             Long memberId,
-                            String email,
                             String nickname,
                             String profileImageUrl) {
         this.authorities = authorities;
         this.attributes = attributes;
         this.nameAttributeKey = nameAttributeKey;
         this.memberId = memberId;
-        this.email = email;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
     }

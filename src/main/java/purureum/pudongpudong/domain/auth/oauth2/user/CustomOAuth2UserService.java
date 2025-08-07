@@ -55,45 +55,61 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
      * 카카오 사용자 정보를 처리합니다.
      */
     private OAuth2User processKakaoUser(String accessToken) {
-        // 카카오 API로부터 사용자 정보 가져오기
-        KakaoUserInfoDto kakaoUserInfo = kakaoService.getKakaoUserInfo(accessToken);
-        
-        // 카카오 사용자 정보에서 필요한 데이터 추출
-        String providerId = String.valueOf(kakaoUserInfo.getId());
-        String email = kakaoUserInfo.getKakaoAccount().getEmail();
-        String nickname = kakaoUserInfo.getKakaoAccount().getProfile().getNickname();
-        String profileImageUrl = kakaoUserInfo.getKakaoAccount().getProfile().getProfileImageUrl();
+        try {
+            log.info("카카오 사용자 정보 요청 시작");
+            
+            // 카카오 API로부터 사용자 정보 가져오기
+            KakaoUserInfoDto kakaoUserInfo = kakaoService.getKakaoUserInfo(accessToken);
+            
+            if (kakaoUserInfo == null) {
+                log.error("카카오 사용자 정보가 null입니다.");
+                throw new RuntimeException("카카오 사용자 정보를 가져올 수 없습니다.");
+            }
+            
+            log.info("카카오 사용자 정보: {}", kakaoUserInfo);
+            
+            // 카카오 사용자 정보에서 필요한 데이터 추출
+            String providerId = String.valueOf(kakaoUserInfo.getId());
+            String nickname = kakaoUserInfo.getKakaoAccount().getProfile().getNickname();
+            String profileImageUrl = kakaoUserInfo.getKakaoAccount().getProfile().getProfileImageUrl();
 
-        // DB에서 기존 사용자 조회
-        Member member = memberRepository.findByProviderAndProviderId("kakao", providerId)
-                .orElseGet(() -> {
-                    // 새 사용자 생성
-                    Member newMember = Member.builder()
-                            .provider("kakao")
-                            .providerId(providerId)
-                            .email(email)
-                            .nickname(nickname)
-                            .profileImageUrl(profileImageUrl)
-                            .role(Role.USER)
-                            .build();
-                    return memberRepository.save(newMember);
-                });
+            log.info("추출된 정보 - providerId: {}, nickname: {}, profileImageUrl: {}", 
+                    providerId, nickname, profileImageUrl);
 
-        // 기존 사용자인 경우 정보 업데이트
-        if (member.getId() != null) {
-            member.update(nickname, profileImageUrl);
-            memberRepository.save(member);
+            // DB에서 기존 사용자 조회
+            Member member = memberRepository.findByProviderAndProviderId("kakao", providerId)
+                    .orElseGet(() -> {
+                        log.info("새로운 카카오 사용자 생성: {}", providerId);
+                        // 새 사용자 생성 (email 필드 제거)
+                        Member newMember = Member.builder()
+                                .provider("kakao")
+                                .providerId(providerId)
+                                .nickname(nickname)
+                                .profileImageUrl(profileImageUrl)
+                                .role(Role.USER)
+                                .build();
+                        return memberRepository.save(newMember);
+                    });
+
+            // 기존 사용자인 경우 정보 업데이트
+            if (member.getId() != null) {
+                log.info("기존 사용자 정보 업데이트: {}", member.getId());
+                member.update(nickname, profileImageUrl);
+                memberRepository.save(member);
+            }
+
+            // CustomOAuth2User 객체 생성 및 반환 (email 제거)
+            return new CustomOAuth2User(
+                    Collections.singletonList(new SimpleGrantedAuthority(member.getRole().getKey())),
+                    Map.of("id", providerId, "nickname", nickname, "profileImageUrl", profileImageUrl),
+                    "id",
+                    member.getId(),
+                    member.getNickname(),
+                    member.getProfileImageUrl()
+            );
+        } catch (Exception e) {
+            log.error("카카오 사용자 정보 처리 중 오류 발생", e);
+            throw new RuntimeException("카카오 로그인 처리 중 오류가 발생했습니다: " + e.getMessage());
         }
-
-        // CustomOAuth2User 객체 생성 및 반환
-        return new CustomOAuth2User(
-                Collections.singletonList(new SimpleGrantedAuthority(member.getRole().getKey())),
-                Map.of("id", providerId, "email", email, "nickname", nickname),
-                "id",
-                member.getId(),
-                member.getEmail(),
-                member.getNickname(),
-                member.getProfileImageUrl()
-        );
     }
 } 

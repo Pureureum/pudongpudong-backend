@@ -19,11 +19,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      * @return 조회된 Member 객체 (Optional)
      */
     Optional<Member> findByProviderAndProviderId(String provider, String providerId);
-
-    /**
-     * 주어진 이메일로 Member를 조회합니다.
-     * @param email 사용자 이메일
-     * @return 조회된 Member 객체 (Optional)
-     */
-    Optional<Member> findByEmail(String email);
 }

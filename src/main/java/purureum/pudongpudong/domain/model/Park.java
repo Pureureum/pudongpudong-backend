@@ -37,6 +37,7 @@ public class Park extends BaseEntity {
 	@Column(columnDefinition = "DECIMAL(10, 7)", nullable = false)
 	private Double latitude;
 	
-	@OneToMany(mappedBy = "fairy", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
+	@OneToMany(mappedBy = "park", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Fairy> fairies = new ArrayList<>();
 }

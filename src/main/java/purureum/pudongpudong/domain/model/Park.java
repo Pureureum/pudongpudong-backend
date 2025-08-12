@@ -40,4 +40,8 @@ public class Park extends BaseEntity {
 	@Builder.Default
 	@OneToMany(mappedBy = "park", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Fairy> fairies = new ArrayList<>();
+	
+	@Builder.Default
+	@OneToMany(mappedBy = "park", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Review> reviews = new ArrayList<>();
 }

@@ -18,7 +18,8 @@ public class SecurityConfig {
 			"/api/auth/**",
 			"/swagger-ui/**",
 			"/v3/api-docs/**",
-			"/swagger-resources/**"
+			"/swagger-resources/**",
+			"/api/**" // TODO: 로그인 구현 후 수정 필요
 	};
 	
 	@Bean

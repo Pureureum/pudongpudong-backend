@@ -15,10 +15,10 @@ public class ParkTag extends BaseEntity {
 	private Long id;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "park_id")
+	@JoinColumn(name = "park_id", nullable = false)
 	private Park park;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "tag_id")
+	@JoinColumn(name = "tag_id", nullable = false)
 	private Tag tag;
 }

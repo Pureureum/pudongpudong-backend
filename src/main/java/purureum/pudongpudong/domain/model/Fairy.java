@@ -21,7 +21,7 @@ public class Fairy extends BaseEntity {
 	@Column(nullable = false)
 	private String description;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "park_id", nullable = true)
 	private Park park;
 }

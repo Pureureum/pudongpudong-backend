@@ -5,8 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import purureum.pudongpudong.domain.model.Park;
+import purureum.pudongpudong.domain.model.Review;
 import purureum.pudongpudong.domain.repository.ParkRepository;
 import purureum.pudongpudong.infrastructure.adapter.api.KakaoNaviApiService;
+import purureum.pudongpudong.infrastructure.dto.FairyDto;
+import purureum.pudongpudong.infrastructure.dto.ParkDetailResponseDto;
 import purureum.pudongpudong.infrastructure.dto.ParkResponseDto;
 import purureum.pudongpudong.infrastructure.dto.api.KakaoNaviApiRequestDto;
 import purureum.pudongpudong.infrastructure.dto.api.KakaoNaviApiResponseDto;
@@ -61,5 +64,35 @@ public class ParkQueryServiceImpl implements ParkQueryService {
 										});
 							});
 				});
+	}
+	
+	@Override
+	public List<ParkDetailResponseDto> searchParksByKeyword(String keyword) {
+		
+		List<Park> parks = parkRepository.findParksByPlaceNameContaining(keyword);
+		
+		return parks.stream()
+				.map(park -> {
+					List<String> tags = park.getParkTags().stream()
+							.map(parkTag -> parkTag.getTag().getName())
+							.toList();
+					
+					double averageRating = park.getReviews().stream()
+							.mapToDouble(Review::getRating)
+							.average()
+							.orElse(0.0);
+					
+					int reviewCount = park.getReviews().size();
+					
+					return new ParkDetailResponseDto(
+							park.getPlaceName(),
+							park.getDescription(),
+							(park.getFairy() != null ? FairyDto.toDto(park.getFairy()) : null),
+							tags,
+							park.getDifficulty(),
+							averageRating,
+							reviewCount
+					);
+				}).collect(Collectors.toList());
 	}
 }

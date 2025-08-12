@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import purureum.pudongpudong.application.command.ParkCommandService;
 import purureum.pudongpudong.application.query.ParkQueryService;
 import purureum.pudongpudong.global.apiPayload.ApiResponse;
+import purureum.pudongpudong.infrastructure.dto.ParkDetailResponseDto;
 import purureum.pudongpudong.infrastructure.dto.ParkResponseDto;
 import reactor.core.publisher.Mono;
 
@@ -28,6 +29,14 @@ public class ParkController {
 	public Mono<ApiResponse<List<ParkResponseDto>>> getParkMap(@RequestParam Double x,
 															   @RequestParam Double y) {
 		return parkQueryService.getAllParksWithMyLocation(x, y).collectList().map(ApiResponse::onSuccess);
+	}
+	
+	@Operation(
+			summary = "공원 검색 API",
+			description = "키워드로 공원을 검색합니다.")
+	@GetMapping("/search")
+	public ApiResponse<List<ParkDetailResponseDto>> searchParks(@RequestParam String keyword) {
+		return ApiResponse.onSuccess(parkQueryService.searchParksByKeyword(keyword));
 	}
 	
 }

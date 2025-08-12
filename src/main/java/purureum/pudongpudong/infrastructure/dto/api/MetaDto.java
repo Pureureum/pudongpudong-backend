@@ -1,4 +1,4 @@
-package purureum.pudongpudong.infrastructure.dto;
+package purureum.pudongpudong.infrastructure.dto.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

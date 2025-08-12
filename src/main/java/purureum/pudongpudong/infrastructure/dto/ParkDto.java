@@ -1,6 +1,7 @@
 package purureum.pudongpudong.infrastructure.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import purureum.pudongpudong.domain.model.enums.ParkDifficulty;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ParkDto {
 	
 	@JsonProperty("id")
@@ -24,11 +26,11 @@ public class ParkDto {
 	@JsonProperty("road_address_name")
 	private String roadAddressName;
 	
-	@JsonProperty("y")
-	private String latitude;
-	
 	@JsonProperty("x")
 	private String longitude;
+	
+	@JsonProperty("y")
+	private String latitude;
 	
 	@JsonProperty("place_url")
 	private String placeUrl;

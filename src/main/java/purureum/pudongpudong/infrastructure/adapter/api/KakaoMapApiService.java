@@ -3,7 +3,7 @@ package purureum.pudongpudong.infrastructure.adapter.api;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import purureum.pudongpudong.infrastructure.dto.KakaoMapApiResponse;
+import purureum.pudongpudong.infrastructure.dto.api.KakaoMapApiResponseDto;
 import purureum.pudongpudong.infrastructure.dto.ParkDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,13 +14,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class KakaoMapApiService {
 
 	private final WebClient webClient;
-	private final String mapApiKey;
+	private final String kakaoApiKey;
 	
 	public KakaoMapApiService(WebClient.Builder webClientBuilder,
                               @Value("${kakao.map.url}") String mapApiUrl,
-							  @Value("${kakao.map.key}") String mapApiKey) {
+							  @Value("${kakao.api.key}") String kakaoApiKey) {
 		this.webClient = webClientBuilder.baseUrl(mapApiUrl).build();
-		this.mapApiKey = mapApiKey;
+		this.kakaoApiKey = kakaoApiKey;
 	}
 	
 	public Flux<ParkDto> getAllParks() {
@@ -36,7 +36,7 @@ public class KakaoMapApiService {
 				.flatMap(response -> Flux.fromIterable(response.getParks()));
 	}
 	
-	private Mono<KakaoMapApiResponse> getParksByPage(int page) {
+	private Mono<KakaoMapApiResponseDto> getParksByPage(int page) {
 		return webClient.get()
 				.uri(uriBuilder -> uriBuilder
 						.path("/v2/local/search/keyword.json")
@@ -44,8 +44,8 @@ public class KakaoMapApiService {
 						.queryParam("rect", "127.009,37.550,127.098,37.600")
 						.queryParam("page", page)
 						.build())
-				.header("Authorization", "KakaoAK " + mapApiKey)
+				.header("Authorization", "KakaoAK " + kakaoApiKey)
 				.retrieve()
-				.bodyToMono(KakaoMapApiResponse.class);
+				.bodyToMono(KakaoMapApiResponseDto.class);
 	}
 }

@@ -23,7 +23,7 @@ public class KakaoNaviApiResponseDto {
 		private int code;
 		
 		@JsonProperty("result_msg")
-		private int message;
+		private String message;
 		
 		@JsonProperty("summary")
 		private Summary summary;

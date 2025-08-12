@@ -14,7 +14,14 @@ public enum ErrorStatus implements BaseErrorCode {
     _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON500", "서버 에러, 관리자에게 문의 바랍니다."),
     _BAD_REQUEST(HttpStatus.BAD_REQUEST,"COMMON400","잘못된 요청입니다."),
     _UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON401","인증이 필요합니다."),
-    _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다.");
+    _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
+    
+    // 외부 API 관련 응답
+    KAKAO_MAP_API_BAD_REQUEST(HttpStatus.INTERNAL_SERVER_ERROR, "KAKAO4001", "카카오 맵 API 호출을 잘못된 요청으로 인해 실패했습니다."),
+    KAKAO_MAP_API_SERVER_ERROR(HttpStatus.BAD_REQUEST, "KAKAO5001", "카카오 맵 API 호출을 서버 에러로 인해 실패했습니다."),
+    KAKAO_NAVI_API_BAD_REQUEST(HttpStatus.INTERNAL_SERVER_ERROR, "KAKAO4002", "카카오 네비 API 호출을 잘못된 요청으로 인해 실패했습니다."),
+    KAKAO_NAVI_API_SERVER_ERROR(HttpStatus.BAD_REQUEST, "KAKAO5002", "카카오 네비 API 호출을 서버 에러로 인해 실패했습니다.")
+    ;
 
     private final HttpStatus httpStatus;
     private final String code;

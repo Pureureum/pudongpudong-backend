@@ -32,9 +32,6 @@ public class ParkDto {
 	@JsonProperty("y")
 	private String latitude;
 	
-	@JsonProperty("place_url")
-	private String placeUrl;
-	
 	public Park toEntity() {
 		return Park.builder()
 				.id(this.getId())
@@ -43,7 +40,6 @@ public class ParkDto {
 				.roadAddressName(this.getRoadAddressName())
 				.latitude(Double.parseDouble(this.getLatitude()))
 				.longitude(Double.parseDouble(this.getLongitude()))
-				.placeUrl(this.getPlaceUrl())
 				.description("설명 정보가 없습니다.")
 				.difficulty(ParkDifficulty.NORMAL)
 				.build();

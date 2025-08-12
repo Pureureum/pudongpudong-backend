@@ -5,6 +5,9 @@ import lombok.*;
 import purureum.pudongpudong.domain.model.enums.ParkDifficulty;
 import purureum.pudongpudong.global.common.domain.BaseEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -25,14 +28,15 @@ public class Park extends BaseEntity {
 	@Column(nullable = false, length = 100)
 	private String description;
 	
+	@Enumerated(EnumType.STRING)
+	private ParkDifficulty difficulty;
+	
 	@Column(columnDefinition = "DECIMAL(10, 7)", nullable = false)
 	private Double longitude;
 	
 	@Column(columnDefinition = "DECIMAL(10, 7)", nullable = false)
 	private Double latitude;
 	
-	private String placeUrl;
-	
-	@Enumerated(EnumType.STRING)
-	private ParkDifficulty difficulty;
+	@OneToMany(mappedBy = "fairy", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Fairy> fairies = new ArrayList<>();
 }

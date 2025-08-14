@@ -32,15 +32,12 @@ public class WeatherService {
     @Value("${weather.kma.base-url}")
     private String baseUrl;
 
-    /**
-     * 현재 날씨 조회
-     */
     public WeatherResponseDTO getCurrentWeather(WeatherRequestDTO request) {
         try {
             String baseTime = calculateBaseTime();
             String baseDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             
-            // 데이터 기준 시간 정보 계산
+            // 시간 계산
             LocalDateTime dataTime = calculateDataTime();
             LocalDateTime nextUpdateTime = calculateNextUpdateTime();
 
@@ -68,16 +65,13 @@ public class WeatherService {
             );
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                
-                // XML 응답을 파싱하여 WeatherResponseDTO 생성
+
                 WeatherResponseDTO responseBody = parseXmlResponse(response.getBody());
                 if (responseBody != null) {
                     setWeatherDataTimeInfo(responseBody, dataTime, nextUpdateTime);
                     return responseBody;
                 }
             }
-            
-            log.error("현재 날씨 조회 실패: {}", response.getStatusCode());
             return null;
 
         } catch (Exception e) {
@@ -94,7 +88,7 @@ public class WeatherService {
         int hour = now.getHour();
         int minute = now.getMinute();
 
-        // 기상청 API는 매시각 45분에 생성되어 발표시각으로부터 10분 후부터 API 제공
+        // 기상청 API는 매시각 45분에 생성되어 발표시각으로부터 10분 후부터 API 제공합니다.
         if (minute < 45) {
             hour = hour - 1;
         }
@@ -102,7 +96,6 @@ public class WeatherService {
         if (hour < 0) {
             hour = 23;
         }
-
         return String.format("%02d%02d", hour, 0);
     }
 

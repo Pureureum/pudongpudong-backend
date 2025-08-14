@@ -62,10 +62,10 @@ public class WeatherResponseDTO {
     @Data
     public static class WeatherItem {
         @JsonProperty("baseDate")
-        private String baseDate; // 기준 날짜
+        private String baseDate;
         
         @JsonProperty("baseTime")
-        private String baseTime; // 기준 시간
+        private String baseTime;
         
         @JsonProperty("category")
         private String category; // 기상 요소 (예: TMP, REH, WSD)

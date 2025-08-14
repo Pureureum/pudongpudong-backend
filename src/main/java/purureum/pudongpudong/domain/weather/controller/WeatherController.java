@@ -28,11 +28,6 @@ public class WeatherController {
 
     private final WeatherService weatherService;
 
-
-
-    /**
-     * 동대문구 현재 날씨 조회 (기본값)
-     */
     @PostMapping("/current")
     @Operation(summary = "동대문구 현재 날씨 조회", description = "동대문구의 현재 날씨를 조회합니다.")
     public ResponseEntity<ApiResponse<WeatherResponseDTO>> getCurrentWeather() {
@@ -50,9 +45,6 @@ public class WeatherController {
         }
     }
 
-    /**
-     * 지역별 현재 날씨 조회
-     */
     @PostMapping("/current/region")
     @Operation(summary = "지역별 현재 날씨 조회", description = "지정한 지역의 현재 날씨를 조회합니다.")
     public ResponseEntity<ApiResponse<WeatherResponseDTO>> getCurrentWeatherByRegion(
@@ -70,9 +62,6 @@ public class WeatherController {
         }
     }
 
-    /**
-     * GET 방식으로 지역별 현재 날씨 조회
-     */
     @GetMapping("/current/region/{regionCode}")
     @Operation(summary = "지역별 현재 날씨 조회 (GET)", description = "지역코드로 현재 날씨를 조회합니다.")
     public ResponseEntity<ApiResponse<WeatherResponseDTO>> getCurrentWeatherByRegionGet(
@@ -93,19 +82,11 @@ public class WeatherController {
         }
     }
 
-
-
-
-
-    /**
-     * 기상청 API 상태 확인
-     */
     @GetMapping("/status")
     @Operation(summary = "기상청 API 상태 확인", description = "기상청 API 연결 상태를 확인합니다.")
     public ResponseEntity<ApiResponse<String>> getWeatherApiStatus() {
         log.info("기상청 API 상태 확인 요청 받음");
-        
-        // 간단한 테스트 요청으로 API 상태 확인
+
         WeatherRequestDTO testRequest = new WeatherRequestDTO();
         testRequest.setRegionCode("11000"); // 서울
         testRequest.setDate(java.time.LocalDate.now().toString());
@@ -119,20 +100,15 @@ public class WeatherController {
         }
     }
 
-    /**
-     * 데이터 기준 시간 정보 조회
-     */
     @GetMapping("/data-time-info")
     @Operation(summary = "데이터 기준 시간 정보", description = "현재 날씨 데이터의 기준 시간과 다음 업데이트 정보를 조회합니다.")
     public ResponseEntity<ApiResponse<Object>> getDataTimeInfo() {
         log.info("데이터 기준 시간 정보 조회 요청 받음");
         
-        // 현재 시간 기준으로 데이터 시간 정보 계산
         LocalDateTime now = LocalDateTime.now();
         int currentHour = now.getHour();
         int currentMinute = now.getMinute();
-        
-        // 데이터 기준 시간 계산
+
         int dataHour = currentMinute < 50 ? currentHour - 1 : currentHour;
         if (dataHour < 0) dataHour = 23;
         
